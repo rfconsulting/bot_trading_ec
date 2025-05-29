@@ -1,4 +1,4 @@
-# Bot de Trading 
+# Bot de Trading - Producto Mínimo Viable (MVP)
 
 ## Descripción
 
