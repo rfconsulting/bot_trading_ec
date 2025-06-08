@@ -5,8 +5,9 @@ import pandas as pd
 from connect_ws import connect_ws, close_ws
 from indicators import calculate_indicators
 from data import download_and_update_data, update_with_latest_data
-from trading import place_trade, check_entry
+from trading import place_trade
 from stadisty import log_trade, calcular_efectividad, CSV_FILE
+from strategy import check_entry_bollinger_rebound_dynamic
 
 
 async def main():
@@ -16,7 +17,7 @@ async def main():
             await update_with_latest_data()
             print("📊 Datos descargados y actualizados.")
             df = pd.read_csv(CSV_FILE, parse_dates=["Time"])
-            signal = check_entry(df)
+            signal = check_entry_bollinger_rebound_dynamic(df)
             if signal:
                 ws = await connect_ws()
                 try:

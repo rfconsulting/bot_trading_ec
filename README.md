@@ -2,21 +2,42 @@
 
 ## Descripción
 
-Bot de trading en Python basado en la siguiente estrategia para usar con datos de trading (operando en la plataforma Deriv):
+Bot de trading en Python para operar en Deriv usando estrategias basadas en medias móviles exponenciales (EMA) y Bandas de Bollinger.
 
-- Utiliza tres medias móviles exponenciales (EMA):
-  - EMA de 200 períodos (tendencia general)
-  - EMA de 50 períodos
-  - EMA de 5 períodos
-- Añade una Banda de Bollinger con los parámetros estándar (20 períodos, 2 desviaciones estándar).
+## Estrategias Disponibles
 
-### Condiciones de entrada a una operación
+### 1. Estrategia Clásica de Vela Contraria + Bollinger
 
-- El precio debe salir fuera de la Banda de Bollinger.
-- Luego debe formarse una vela contraria que cubra más del 50% del cuerpo de la vela anterior (ejemplo: si la vela anterior fue bajista, se necesita una vela alcista que cubra más del 50% de su cuerpo).
-- Si se cumple, se ejecuta la entrada en la dirección de la nueva vela.
-- La reentrada se hace cada vez que se repite la condición anterior.
+- **Filtro de tendencia:** Usa la EMA de 200 períodos para definir si solo busca compras (tendencia alcista) o ventas (tendencia bajista).
+- **Condiciones de entrada:**
+  - El precio debe salir fuera de la Banda de Bollinger (Close < BB_lower para compras, Close > BB_upper para ventas).
+  - Debe formarse una vela contraria que cubra más del 50% del cuerpo de la vela anterior.
+  - Si se cumple, se ejecuta la entrada en la dirección de la nueva vela.
 
+### 2. Estrategia de Rebote Técnico Dinámico en Bandas de Bollinger
+
+- **Filtro de tendencia:** Usa la EMA de 200 períodos para definir la tendencia.
+- **Condiciones de entrada:**
+  - **Tendencia alcista:**  
+    - Close < BB_lower  
+    - EMA_5 > EMA_50  
+    - (EMA_5 - Close) / Close > 0.003  
+    - Señal de compra ("buy")
+  - **Tendencia bajista:**  
+    - Close > BB_upper  
+    - EMA_5 < EMA_50  
+    - (Close - EMA_5) / Close > 0.003  
+    - Señal de venta ("sell")
+
+## Selección de Estrategia
+
+Puedes elegir la estrategia a utilizar modificando la variable `STRATEGY` en el archivo `bot.py`:
+
+```python
+STRATEGY = "classic"  # Para la estrategia clásica de vela contraria
+# o
+STRATEGY = "bollinger_rebound_dynamic"  # Para la estrategia de rebote técnico dinámico
+```
 
 ## Instalación y ejecución
 
@@ -64,9 +85,12 @@ token=TU_TOKEN
 
 Reemplaza `TU_APP_ID` y `TU_TOKEN` con los valores correspondientes.
 
-
 ### 6. Ejecutar la aplicación principal
 
 ```bash
 python bot.py
 ```
+
+---
+
+**Puedes modificar la estrategia en cualquier momento cambiando el valor de la variable `STRATEGY` en `bot.py`.**
